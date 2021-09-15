@@ -1,1 +1,3 @@
 # Lake_Michigan_Water_Level_Forecasting
+
+Rising Lake Michigan water levels are causing infrastructure problems from Wisconsin to Michigan.  We will attempt to forecast the rise to help city planners figure out how to address the problem and plan for the future. In this work, ARIMA. Holt-Winter Model, Exponential Smoothing Model, and ARIMAX Model are used to forecast the water level. ARIMAX model performs better with narrower confidence interval to forecast as it considers other weather data (temperature, precipitation, seal level changes, etc.) along with historical water level data. However, we understand that the rapid global climate changes are causing the faster rise of Lake Michigan water level, and those features should be considered for forecasting.
