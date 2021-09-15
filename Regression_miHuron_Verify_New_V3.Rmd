@@ -1,0 +1,156 @@
+---
+title: "Regression_miHuron"
+author: "S M Nazarat Hossain"
+date: "February 25, 2020"
+output: html_document
+---
+
+
+```{r, warning=FALSE, message=FALSE}
+# Loading library
+library(xts)
+library(forecast)
+library(forecast)
+library(tseries)
+library(TSA)
+library(knitr)
+```
+```{r}
+dataPath <- 'C:/Users/nazar/Desktop/Project_time_series/'
+dat <- read.csv(paste0(dataPath,'Data_V3.csv'),header = T)
+head(dat)
+```
+
+
+```{r}
+ts.dat=ts(dat,frequency = 12, start = c(1918,1))
+head(ts.dat)
+```
+
+# Splitting data
+
+Split data into train and test dataset
+```{r}
+tsreg.train<-window(ts.dat,start=c(1950,1),end=c(2015,12))
+tsreg.test<-window(ts.dat,start=c(2016,1),end=c(2019,12))
+```
+
+
+# Arimax model 
+
+
+```{r}
+tsreg.sarima60 <- arimax(tsreg.train[,"water_levels"], xreg = tsreg.train[,c("sea_level_changes", 
+                     "airTemp_overlake", "airTemp_overland", "precipitation_depth_overland",        "precipitation_depth_overlake")], order=c(1,1,1), seasonal = c(1,0,1))
+summary(tsreg.sarima60)
+checkresiduals(tsreg.sarima60)
+```
+
+
+```{r}
+#tsreg.sarima60 <- Arima(tsreg.test[,"water_levels"], model=tsreg.sarima61, xreg=tsreg.test[,c(4:8)])
+fcast.tsreg.sarima60<-forecast(tsreg.sarima60, xreg=tsreg.test[,c(4:8)])
+plot(fcast.tsreg.sarima60)
+
+```
+
+```{r}
+
+ts.plot(data.frame(tsreg.test)$water_levels,fcast.tsreg.sarima60$mean, col = c("red", "blue"))
+legend("topleft", bty="n", lty=c(1,1), col=c("red","blue"),
+       legend=c(" Test ", "Forecast"))
+```
+
+
+Prf Rob J Hyndman: To apply a model to a new data set, first construct the model object, then forecast. Like this
+
+fit2 <- Arima(dat[,2], model=fit, xreg=dat[,-1])
+forecast(fit2, xreg=ex)
+
+# Plot Armax model
+
+```{r}
+tsreg.sarima61 <- Arima(tsreg.train[,"water_levels"], xreg = tsreg.train[,c("sea_level_changes", 
+                     "airTemp_overlake", "airTemp_overland", "precipitation_depth_overland",                    "precipitation_depth_overlake")], order=c(1,1,1), seasonal = c(1,0,1))
+summary(tsreg.sarima61)
+checkresiduals(tsreg.sarima61)
+```
+```{r}
+
+fcast.tsreg.sarima61<-forecast(tsreg.sarima61, xreg=tsreg.test[,c(4:8)])
+plot(fcast.tsreg.sarima61)
+```
+```{r}
+
+ts.plot(data.frame(tsreg.test)$water_levels,fcast.tsreg.sarima61$mean, col = c("red", "blue"))
+legend("topleft", bty="n", lty=c(1,1), col=c("red","blue"),
+       legend=c(" Test ", "Forecast"))
+```
+
+
+```{r}
+tsreg.sarima62 <- arimax(tsreg.train[,"water_levels"], xreg = tsreg.train[,c("sea_level_changes", 
+                     "airTemp_overlake", "airTemp_overland", "precipitation_depth_overland",                        "precipitation_depth_overlake")], order=c(1,1,1), seasonal = c(1,0,1))
+summary(tsreg.sarima62)
+checkresiduals(tsreg.sarima62)
+```
+
+Coefficients:
+         ar1      ma1    sar1     sma1  sea_level_changes  airTemp_overlake  airTemp_overland
+      0.5220  -0.0224  0.9998  -0.9845             0.0201            0.0038             6e-04
+s.e.  0.0662   0.0805  0.0004   0.0166             0.0014            0.0013             5e-04
+      precipitation_depth_overland  precipitation_depth_overlake
+                             1e-04                         0e+00
+s.e.                         1e-04                         1e-04
+
+sigma^2 estimated as 0.001324:  log likelihood=1497.53
+AIC=-2975.05   AICc=-2974.77   BIC=-2928.32
+
+Training set error measures:
+                        ME      RMSE        MAE         MPE       MAPE      MASE        ACF1
+Training set -0.0005432214 0.0361507 0.02785781 -0.00030563 0.01578516 0.1358663 0.005327611
+
+	Ljung-Box test
+
+data:  Residuals from Regression with ARIMA(1,1,1)(1,0,1)[12] errors
+Q* = 21.108, df = 15, p-value = 0.1334
+
+Model df: 9.   Total lags used: 24
+
+
+```{r}
+tsreg.sarima63 <- Arima(tsreg.train[,"water_levels"], xreg = tsreg.train[,c("sea_level_changes", 
+                     "airTemp_overlake", "airTemp_overland", "precipitation_depth_overland",                        "precipitation_depth_overlake")], order=c(1,1,1), seasonal = c(1,0,1))
+summary(tsreg.sarima63)
+checkresiduals(tsreg.sarima63)
+```
+
+
+
+# sarima regression model with d=1, D=1, and lambda = 1
+
+
+```{r}
+tsreg.sarima25 <- auto.arima(tsreg.train[,"water_levels"], xreg = tsreg.train[,c("sea_level_changes", 
+                     "airTemp_overlake", "airTemp_overland", "precipitation_depth_overland",                                    "precipitation_depth_overlake") ], d=1, D=1,lambda = 1)
+
+summary(tsreg.sarima25)
+checkresiduals(tsreg.sarima25)
+```
+
+
+
+
+
+```{r}
+
+fcast.tsreg.sarima25<-forecast(tsreg.sarima25, xreg=tsreg.test[,c(4:8)])
+plot(fcast.tsreg.sarima25)
+```
+```{r}
+
+ts.plot(data.frame(tsreg.test)$water_levels,fcast.tsreg.sarima25$mean, col = c("red", "blue"))
+legend("topleft", bty="n", lty=c(1,1), col=c("red","blue"),
+       legend=c(" Test ", "Forecast"))
+```
+
